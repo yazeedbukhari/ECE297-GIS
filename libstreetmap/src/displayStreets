@@ -1,0 +1,339 @@
+int rgb[3] = {255, 255, 255};
+   
+   //Looping through street segments
+   for(int streetSegmentID = 0; streetSegmentID < getNumStreetSegments(); ++streetSegmentID){  
+      
+      //set default street width and color (white)
+      g->set_line_width (0.5);
+      g->set_color(255, 255, 255);
+
+      OSMID streetOSMID = street_segment_info[streetSegmentID].wayOSMID;
+
+      std::string key = "highway";
+      std::string tag = getOSMWayTagValue(streetOSMID, key);
+
+      //setting width (depending on zoom factor) and color of streets
+      if (tag == "motorway" || tag == "motorway_link") {
+         g->set_color(255, 213, 128); //orange 
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (4.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (5);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (5);
+         } else {
+            g->set_line_width (5);
+         }
+         rgb[0] = 255;
+         rgb[1] = 213;
+         rgb[2] = 128;
+
+      } else if (tag == "trunk" || tag == "trunk_link") {
+         g->set_color(255, 213, 128); //orange
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (4.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (5);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (5);
+         } else {
+            g->set_line_width (5);
+         }
+         rgb[0] = 255;
+         rgb[1] = 213;
+         rgb[2] = 128;
+
+      } else if (tag == "primary" || tag == "primary_link") {
+         g->set_color(255, 213, 128); //orange
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (3.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (4);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (4.5);
+         } else {
+            g->set_line_width (4.5);
+         }
+         rgb[0] = 255;
+         rgb[1] = 213;
+         rgb[2] = 128;
+
+      } else if (tag == "secondary" || tag == "secondary_link") {
+         g->set_color(255, 255, 255);
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (2);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (3);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (4);
+         } else {
+            g->set_line_width (4.5);
+         }
+         rgb[0] = 255;
+         rgb[1] = 255;
+         rgb[2] = 255;
+
+      } else if (tag == "tertiary" || tag == "tertiary_link") {
+         g->set_color(255, 255, 255);
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (0.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (0.75);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (1.25);
+         } else if (zoomFactor >= 0.1296){
+            g->set_line_width (3.5);
+         } else {
+            g->set_line_width (4);
+         }
+         rgb[0] = 255;
+         rgb[1] = 255;
+         rgb[2] = 255;
+
+      } else if (tag == "road") {
+         g->set_color(255, 255, 255);
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (0.75);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (1.25);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (1.75);
+         } else if (zoomFactor >= 0.1296) {
+            g->set_line_width (2.5);
+         } else {
+            g->set_line_width (3);
+         }
+         rgb[0] = 255;
+         rgb[1] = 255;
+         rgb[2] = 255;
+
+      } else if (tag == "unclassified" || tag == "unclassified_link") {
+         g->set_color(255, 255, 255);
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (0.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (1);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (1.5);
+         } else if (zoomFactor >= 0.1296) {
+            g->set_line_width (2.5);
+         } else {
+            g->set_line_width (3);
+         }
+         rgb[0] = 255;
+         rgb[1] = 255;
+         rgb[2] = 255;
+
+      } else if (tag == "residential" || tag == "residential_link") {
+         g->set_color(255, 255, 255);
+         if (zoomFactor >= 0.6) {
+            g->set_line_width (0.5);
+         } else if (zoomFactor >= 0.36) {
+            g->set_line_width (1);
+         } else if (zoomFactor >= 0.216) {
+            g->set_line_width (1.5);
+         } else if (zoomFactor >= 0.1296) {
+            g->set_line_width (2.5);
+         } else {
+            g->set_line_width (3);
+         }
+         rgb[0] = 255;
+         rgb[1] = 255;
+         rgb[2] = 255;
+      }
+
+      int numCurvePoints = streetSegmentIdx_point2dxyCurvepoints[streetSegmentID].size();
+      std::string streetName = getStreetName(street_segment_info[streetSegmentID].streetID);
+
+      //setting flags
+      bool displayStreetName = true;
+      bool displayStreet = true;
+      int printedAt = 0;
+      bool displayArrows = true;
+
+      //do not display unknown street names
+      if (streetName == "<unknown>") { 
+         displayStreetName = false;
+      } 
+
+      //do not display the given street types at the zoom factor value
+      if (zoomFactor >= 0.36) {
+         if (tag == "residential" || tag == "residential_link" || tag == "unclassified" || tag == "unclassified_link" || tag == "road" || tag == "tertiary" || tag == "tertiary_link" 
+             || streetName == "<unknown>") {
+            displayStreetName = false;
+            displayStreet = false;
+         }
+      }
+      
+      //if the street is curved - loop through the smaller segments (curve point to curve point)
+      if (numCurvePoints > 2 && displayStreet) {
+         for (int curvePoint = 0; curvePoint < streetSegmentIdx_point2dxyCurvepoints[streetSegmentID].size() - 1; curvePoint++) {
+            if (pathGlobalBool[streetSegmentID]) {
+               g->set_color(255,109,106);
+            }
+            bool segmentDrawn = false;
+
+            //determining the length and midpoint of inner segment (curve point to curve point)
+            ezgl::point2d startCoord = streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint];
+            ezgl::point2d endCoord = streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1];
+            ezgl::point2d midPoint = startCoord +  endCoord;
+            midPoint.x = (midPoint.x)/2.0;
+            midPoint.y = (midPoint.y)/2.0;
+            double segmentLength = sqrt (pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2));
+
+            //determining angle for text rotation
+            if (startCoord.x != endCoord.x) {
+               double angle = atan((startCoord.y - endCoord.y)/(startCoord.x - endCoord.x));
+               angle = (angle * 180)/M_PI;
+               g->set_text_rotation(angle);
+            } else {
+               g->set_text_rotation(270.0);
+            }
+
+            if (displayStreet) {
+               
+               //displaying the street if the previous, current, or last curve point is within the bounds of the visible world 
+               if(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].x 
+                   && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].y) {
+                  
+                  g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                  segmentDrawn = true;
+
+               } else if (curvePoint + 1 < streetSegmentIdx_point2dxyCurvepoints[streetSegmentID].size()) { 
+                  
+                  if (streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].x 
+                   && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].y) {
+                     
+                     g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                     segmentDrawn = true;
+                  } 
+
+               } else if (curvePoint - 1 > -1) {
+                  if (streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].x 
+                   && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].y) {
+                  
+                     g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                     segmentDrawn = true;
+                  
+                  }
+
+               } else if (midPoint.x > g->get_visible_world().left() && g->get_visible_world().right() > midPoint.x && midPoint.y > g->get_visible_world().bottom() && g->get_visible_world().top() > midPoint.y){
+                     
+                  g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                  segmentDrawn = true;
+
+               } 
+
+
+            }
+
+
+
+            //displaying street names
+            if (curvePoint == 1 && displayStreetName && segmentDrawn) {
+               g->set_color(0, 0, 0);
+               g->draw_text(midPoint, streetName, segmentLength, segmentLength);
+               g->set_color(rgb[0], rgb[1], rgb[2]);
+               printedAt = 1;
+
+            } else if ((curvePoint == printedAt + 3) && displayStreetName && segmentDrawn) {
+               g->set_color(0, 0, 0);
+               g->draw_text(midPoint, streetName, segmentLength, segmentLength);
+               g->set_color(rgb[0], rgb[1], rgb[2]);
+               printedAt = printedAt + 3;
+            }
+
+            //displaying oneWay street arrows (except for segments with names displayed)
+            g->set_color(0, 0, 0);
+            if (street_segment_info[streetSegmentID].oneWay && (curvePoint != printedAt) && (zoomFactor <= 0.6) && segmentDrawn) {
+               if ((streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][0].x < midPoint.x)) {
+                  g->draw_text(midPoint, "->", segmentLength, segmentLength);
+               } else if ((streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][0].x > midPoint.x)) {
+                  g->draw_text(midPoint, "<-", segmentLength, segmentLength);
+               }
+            }
+            g->set_color(rgb[0], rgb[1], rgb[2]);
+         }
+
+      } else {
+         if (displayStreet) {
+            if (pathGlobalBool[streetSegmentID]) {
+               g->set_color(255,109,106);
+            }
+            int curvePoint = 0;
+            bool segmentDrawn = false;
+            
+            //determining the length and midpoint of inner segment (curve point to curve point)
+            ezgl::point2d startCoord = streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][0];
+            ezgl::point2d endCoord = streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][1];
+            ezgl::point2d midPoint;
+            midPoint.x = (startCoord.x + endCoord.x)/2.0;
+            midPoint.y = (midPoint.y)/2.0;
+            double segmentLength = sqrt (pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2));
+
+            if(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].x 
+                  && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint].y) {
+               
+               g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+               segmentDrawn = true;
+
+            } else if (curvePoint + 1 < streetSegmentIdx_point2dxyCurvepoints[streetSegmentID].size()) { 
+               
+               if (streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].x 
+                  && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint+1].y) {
+                  
+                  g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                  segmentDrawn = true;
+               } 
+
+            } else if (curvePoint - 1 > -1) {
+               if (streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].x > g->get_visible_world().left() && g->get_visible_world().right() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].x 
+                  && streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].y > g->get_visible_world().bottom() && g->get_visible_world().top() > streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint-1].y) {
+               
+                  g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+                  segmentDrawn = true;
+
+               } 
+
+            } else if (midPoint.x > g->get_visible_world().left() && g->get_visible_world().right() > midPoint.x && midPoint.y > g->get_visible_world().bottom() && g->get_visible_world().top() > midPoint.y){
+                     
+               g->draw_line(streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint],streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][curvePoint + 1]);
+               segmentDrawn = true;
+
+            } 
+
+            
+
+
+            //determining angle for text rotation
+            if (startCoord.x != endCoord.x) {
+               double angle = atan((startCoord.y - endCoord.y)/(startCoord.x - endCoord.x));
+               angle = (angle * 180)/M_PI;
+               g->set_text_rotation(angle);
+            } else {
+               g->set_text_rotation(270.0);
+            }
+
+            //displaying street names for non-one way streets
+            if (displayStreetName && !street_segment_info[streetSegmentID].oneWay && segmentDrawn) {
+               g->set_color(0, 0, 0);
+               g->draw_text(midPoint, streetName, segmentLength, segmentLength);
+               g->set_color(rgb[0], rgb[1], rgb[2]);
+            }
+            g->set_color(0, 0, 0);
+
+            //displaying street names and arrows for one way streets
+            std::string leftArrow = "<-";
+            std::string rightArrow = "->";
+            if (street_segment_info[streetSegmentID].oneWay && displayStreetName && (zoomFactor <= 0.6) && segmentDrawn) {
+               if ((streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][0].x < midPoint.x)) {
+                  g->draw_text(midPoint, streetName + rightArrow, segmentLength, segmentLength);
+               } else if ((streetSegmentIdx_point2dxyCurvepoints[streetSegmentID][0].x > midPoint.x)) {
+                  g->draw_text(midPoint, streetName + leftArrow, segmentLength, segmentLength);
+               }
+            }
+            g->set_color(rgb[0], rgb[1], rgb[2]);
+         }
+      }
+   }  
+}
